@@ -7,6 +7,7 @@ import { Trash2, Edit2, Plus, Save, X, ExternalLink, MessageSquare, BookOpen, Fl
 import { Research, Blog, Hobby, Profile, Message, TickerImage } from '../types';
 import { Navigate, Link } from 'react-router-dom';
 import { cn, formatImageUrl } from '../lib/utils';
+import { ImageUpload } from '../components/FileUpload';
 
 export default function Admin() {
   const [user, loading] = useAuthState(auth);
@@ -118,9 +119,16 @@ function ProfileManager({ profile, docRef }: { profile?: Profile, docRef: any })
           <label className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">HERO Headline/Bio</label>
           <textarea rows={2} className="w-full border border-black p-4 text-sm resize-none outline-none focus:ring-1 focus:ring-black" value={formData.bio} onChange={e => setFormData({...formData, bio: e.target.value})} />
         </div>
-        <div className="space-y-2">
-          <label className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Hero Image URL</label>
-          <input className="w-full border border-black p-4 text-sm outline-none focus:ring-1 focus:ring-black" placeholder="https://..." value={formData.heroImage} onChange={e => setFormData({...formData, heroImage: e.target.value})} />
+        <div className="md:col-span-2">
+          <ImageUpload 
+            label="Hero Image Upload / URL"
+            currentValue={formData.heroImage}
+            onUpload={(url) => setFormData(prev => ({...prev, heroImage: url}))}
+          />
+          <div className="mt-2">
+            <label className="text-[8px] font-bold tracking-widest text-gray-300 uppercase">OR PASTE EXTERNAL URL</label>
+            <input className="w-full border border-black p-2 text-xs outline-none focus:ring-1 focus:ring-black mt-1" placeholder="https://..." value={formData.heroImage.startsWith('data:') ? 'Local Upload' : formData.heroImage} onChange={e => setFormData(prev => ({...prev, heroImage: e.target.value}))} />
+          </div>
         </div>
         <div className="space-y-2">
           <label className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">CV DOWNLOAD URL</label>
@@ -179,11 +187,23 @@ function ResearchManager({ items }: { items: Research[] }) {
          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <input className="w-full border border-black p-4 text-sm" placeholder="PROJECT TITLE" value={newItem.title} onChange={e => setNewItem({...newItem, title: e.target.value})} />
             <input className="w-full border border-black p-4 text-sm" placeholder="TERM/DATE (e.g. Fall 2025)" value={newItem.date} onChange={e => setNewItem({...newItem, date: e.target.value})} />
-            <input className="md:col-span-2 w-full border border-black p-4 text-sm" placeholder="COVER IMAGE URL" value={newItem.coverImage} onChange={e => setNewItem({...newItem, coverImage: e.target.value})} />
+            
+            <div className="md:col-span-2">
+              <ImageUpload 
+                label="RESEARCH COVER IMAGE"
+                currentValue={newItem.coverImage}
+                onUpload={(url) => setNewItem(prev => ({...prev, coverImage: url}))}
+              />
+              <input className="w-full border border-black p-2 text-xs outline-none mt-1" placeholder="OR PASTE COVER URL" value={newItem.coverImage?.startsWith('data:') ? 'Local Upload' : newItem.coverImage} onChange={e => setNewItem(prev => ({...prev, coverImage: e.target.value}))} />
+            </div>
+
             <textarea className="md:col-span-2 w-full border border-black p-4 text-sm" rows={2} placeholder="SHORT DESCRIPTION (SUMMARY)" value={newItem.description} onChange={e => setNewItem({...newItem, description: e.target.value})} />
             <textarea className="md:col-span-2 w-full border border-black p-4 text-sm font-mono h-48" placeholder="DETAILED CONTENT (MARKDOWN)" value={newItem.content} onChange={e => setNewItem({...newItem, content: e.target.value})} />
             <input className="w-full border border-black p-4 text-sm" placeholder="EXTERNAL LINK (URL)" value={newItem.link} onChange={e => setNewItem({...newItem, link: e.target.value})} />
-            <input className="w-full border border-black p-4 text-sm" placeholder="GALLERY IMAGES (COMMA SEPARATED URLS)" value={newItem.gallery?.join(', ')} onChange={e => handleGalleryChange(e.target.value)} />
+            <div className="w-full">
+               <label className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">GALLERY (MANUAL URLS)</label>
+               <input className="w-full border border-black p-4 text-sm mt-1" placeholder="COMMA SEPARATED URLS" value={newItem.gallery?.join(', ')} onChange={e => handleGalleryChange(e.target.value)} />
+            </div>
          </div>
          <button onClick={add} className="bg-black text-white px-12 py-5 font-bold tracking-[0.2em] text-xs uppercase hover:bg-neutral-800 transition-all">
             Publish Research
@@ -239,8 +259,17 @@ function TickerManager({ items }: { items: TickerImage[] }) {
         <div className="space-y-12">
             <div className="bg-neutral-50 p-10 border-l-8 border-black">
                 <h3 className="font-display font-bold text-2xl mb-8 uppercase tracking-tighter">ADD TICKER IMAGE_</h3>
+                
+                <div className="mb-8">
+                  <ImageUpload 
+                    label="UPLOAD TICKER IMAGE"
+                    currentValue={newImage.url}
+                    onUpload={(url) => setNewImage(prev => ({...prev, url: url}))}
+                  />
+                </div>
+
                 <div className="flex flex-col md:flex-row gap-4">
-                    <input className="flex-grow border border-black p-4 text-sm" placeholder="IMAGE URL (DRIVE LINKS SUPPORTED)" value={newImage.url} onChange={e => setNewImage({...newImage, url: e.target.value})} />
+                    <input className="flex-grow border border-black p-4 text-sm" placeholder="OR PASTE IMAGE URL" value={newImage.url.startsWith('data:') ? 'LOCAL UPLOADED IMAGE' : newImage.url} onChange={e => setNewImage(prev => ({...prev, url: e.target.value}))} />
                     <input className="border border-black p-4 text-sm w-full md:w-48" placeholder="ALT TEXT" value={newImage.alt} onChange={e => setNewImage({...newImage, alt: e.target.value})} />
                     <button 
                         disabled={adding}
@@ -306,7 +335,16 @@ function BlogManager({ items }: { items: Blog[] }) {
          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <input className="w-full border border-black p-4 text-sm font-bold" placeholder="ARTICLE TITLE" value={newItem.title} onChange={e => setNewItem({...newItem, title: e.target.value})} />
             <input className="w-full border border-black p-4 text-sm" placeholder="SLUG (e.g. econometric-insights-2026)" value={newItem.slug} onChange={e => setNewItem({...newItem, slug: e.target.value})} />
-            <input className="md:col-span-2 w-full border border-black p-4 text-sm" placeholder="COVER IMAGE URL" value={newItem.coverImage} onChange={e => setNewItem({...newItem, coverImage: e.target.value})} />
+            
+            <div className="md:col-span-2">
+              <ImageUpload 
+                label="BLOG COVER IMAGE"
+                currentValue={newItem.coverImage}
+                onUpload={(url) => setNewItem(prev => ({...prev, coverImage: url}))}
+              />
+              <input className="w-full border border-black p-2 text-xs outline-none mt-1" placeholder="OR PASTE COVER URL" value={newItem.coverImage?.startsWith('data:') ? 'Local Upload' : newItem.coverImage} onChange={e => setNewItem(prev => ({...prev, coverImage: e.target.value}))} />
+            </div>
+
             <textarea className="md:col-span-2 w-full border border-black p-4 text-sm font-mono h-80" placeholder="MARKDOWN CONTENT" value={newItem.content} onChange={e => setNewItem({...newItem, content: e.target.value})} />
             <input className="md:col-span-2 w-full border border-black p-4 text-sm" placeholder="GALLERY IMAGES (COMMA SEPARATED URLS)" value={newItem.gallery?.join(', ')} onChange={e => handleGalleryChange(e.target.value)} />
          </div>
