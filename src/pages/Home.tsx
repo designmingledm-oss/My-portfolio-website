@@ -14,7 +14,7 @@ export default function Home() {
   const [hobbiesSnap] = useCollection(collection(db, 'hobbies'));
   const [tickerSnap] = useCollection(collection(db, 'ticker'));
   
-  const [profile] = useDocumentData(doc(db, 'profiles', 'default'));
+  const [profile, profileLoading] = useDocumentData(doc(db, 'profiles', 'default'));
 
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
@@ -88,13 +88,27 @@ export default function Home() {
                transition={{ duration: 1, delay: 0.2 }}
                className="lg:col-span-5 relative"
             >
-               <div className="border border-black p-3 bg-white grayscale hover:grayscale-0 transition-all duration-1000 shadow-2xl">
-                    <img 
-                        src={formatImageUrl(profile?.heroImage) || "https://picsum.photos/seed/sabbir/800/1000"} 
-                        alt="Sabbir" 
-                        className="w-full object-cover aspect-[4/5] bg-neutral-100"
-                        referrerPolicy="no-referrer"
-                    />
+               <div className={cn(
+                 "border border-black p-3 bg-white grayscale hover:grayscale-0 transition-all duration-1000 shadow-2xl relative min-h-[400px] flex items-center justify-center overflow-hidden",
+                 profileLoading && "animate-pulse bg-neutral-100"
+               )}>
+                    {profileLoading ? (
+                      <div className="text-[10px] font-bold tracking-[0.5em] text-gray-300 uppercase">SYNCHRONIZING_IMAGE...</div>
+                    ) : (
+                      <img 
+                          src={formatImageUrl(profile?.heroImage) || "https://picsum.photos/seed/sabbir/800/1000"} 
+                          alt="Sabbir" 
+                          className="w-full h-full object-cover aspect-[4/5] bg-neutral-100"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            // If the user's image fails, revert to fallback
+                            const target = e.target as HTMLImageElement;
+                            if (target.src !== "https://picsum.photos/seed/sabbir/800/1000") {
+                              target.src = "https://picsum.photos/seed/sabbir/800/1000";
+                            }
+                          }}
+                      />
+                    )}
                </div>
                {/* Accent elements */}
                <div className="absolute -bottom-6 -left-6 w-24 h-24 border-l-4 border-b-4 border-black hidden xl:block" />
