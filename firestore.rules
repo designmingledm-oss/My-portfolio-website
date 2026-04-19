@@ -29,20 +29,20 @@ service cloud.firestore {
 
     function isValidProfile(data) {
       return data.keys().hasAll(['name', 'email']) &&
-             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
-             data.email is string && data.email.size() <= 200;
+             data.name is string && data.name.size() > 0 &&
+             data.email is string;
     }
 
     function isValidResearch(data) {
       return data.keys().hasAll(['title', 'description']) &&
-             data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.title is string && data.title.size() > 0 &&
              data.description is string && data.description.size() > 0;
     }
 
     function isValidBlog(data) {
       return data.keys().hasAll(['title', 'content', 'slug', 'date']) &&
              data.title is string && data.title.size() > 0 &&
-             data.slug is string && data.slug.matches('^[a-z0-9-]+$');
+             data.slug is string;
     }
 
     function isValidMessage(data) {
@@ -72,6 +72,11 @@ service cloud.firestore {
     }
 
     match /hobbies/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /ticker/{id} {
       allow read: if true;
       allow write: if isAdmin();
     }

@@ -10,6 +10,7 @@ import { cn } from './lib/utils';
 import Home from './pages/Home';
 import Admin from './pages/Admin';
 import BlogDetail from './pages/BlogDetail';
+import ResearchDetail from './pages/ResearchDetail';
 
 export default function App() {
   const [user, loading] = useAuthState(auth);
@@ -121,6 +122,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/blog/:id" element={<BlogDetail />} />
+            <Route path="/research/:id" element={<ResearchDetail />} />
           </Routes>
         </AnimatePresence>
       </main>

@@ -8,6 +8,7 @@
         "name": { "type": "string" },
         "bio": { "type": "string" },
         "cvUrl": { "type": "string" },
+        "heroImage": { "type": "string" },
         "email": { "type": "string" },
         "linkedin": { "type": "string" },
         "github": { "type": "string" }
@@ -21,8 +22,14 @@
       "properties": {
         "title": { "type": "string" },
         "description": { "type": "string" },
+        "content": { "type": "string" },
         "date": { "type": "string" },
-        "link": { "type": "string" }
+        "link": { "type": "string" },
+        "coverImage": { "type": "string" },
+        "gallery": { 
+          "type": "array",
+          "items": { "type": "string" }
+        }
       },
       "required": ["title", "description"]
     },
@@ -34,7 +41,12 @@
         "title": { "type": "string" },
         "content": { "type": "string" },
         "date": { "format": "date-time", "type": "string" },
-        "slug": { "type": "string" }
+        "slug": { "type": "string" },
+        "coverImage": { "type": "string" },
+        "gallery": { 
+          "type": "array",
+          "items": { "type": "string" }
+        }
       },
       "required": ["title", "content", "slug"]
     },
@@ -47,6 +59,16 @@
         "icon": { "type": "string" }
       },
       "required": ["name"]
+    },
+    "TickerImage": {
+      "title": "Ticker Image",
+      "description": "Images for the scroll ticker",
+      "type": "object",
+      "properties": {
+        "url": { "type": "string" },
+        "alt": { "type": "string" }
+      },
+      "required": ["url"]
     },
     "Message": {
       "title": "Contact Message",
@@ -77,6 +99,10 @@
     "/hobbies/{id}": {
       "schema": "Hobby",
       "description": "Stores hobbies"
+    },
+    "/ticker/{id}": {
+      "schema": "TickerImage",
+      "description": "Stores images for the gallery ticker"
     },
     "/messages/{id}": {
       "schema": "Message",
