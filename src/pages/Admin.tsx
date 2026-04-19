@@ -7,7 +7,7 @@ import { Trash2, Edit2, Plus, Save, X, ExternalLink, MessageSquare, BookOpen, Fl
 import { Research, Blog, Hobby, Profile, Message, TickerImage } from '../types';
 import { Navigate, Link } from 'react-router-dom';
 import { cn, formatImageUrl } from '../lib/utils';
-import { ImageUpload } from '../components/FileUpload';
+import { FileUpload } from '../components/FileUpload';
 
 export default function Admin() {
   const [user, loading] = useAuthState(auth);
@@ -120,7 +120,7 @@ function ProfileManager({ profile, docRef }: { profile?: Profile, docRef: any })
           <textarea rows={2} className="w-full border border-black p-4 text-sm resize-none outline-none focus:ring-1 focus:ring-black" value={formData.bio} onChange={e => setFormData({...formData, bio: e.target.value})} />
         </div>
         <div className="md:col-span-2">
-          <ImageUpload 
+          <FileUpload 
             label="Hero Image Upload / URL"
             currentValue={formData.heroImage}
             onUpload={(url) => setFormData(prev => ({...prev, heroImage: url}))}
@@ -130,9 +130,18 @@ function ProfileManager({ profile, docRef }: { profile?: Profile, docRef: any })
             <input className="w-full border border-black p-2 text-xs outline-none focus:ring-1 focus:ring-black mt-1" placeholder="https://..." value={formData.heroImage.startsWith('data:') ? 'Local Upload' : formData.heroImage} onChange={e => setFormData(prev => ({...prev, heroImage: e.target.value}))} />
           </div>
         </div>
-        <div className="space-y-2">
-          <label className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">CV DOWNLOAD URL</label>
-          <input className="w-full border border-black p-4 text-sm outline-none focus:ring-1 focus:ring-black" value={formData.cvUrl} onChange={e => setFormData({...formData, cvUrl: e.target.value})} />
+        <div className="md:col-span-2">
+          <FileUpload 
+            label="CV DOCUMENT UPLOAD (PDF)"
+            currentValue={formData.cvUrl}
+            type="pdf"
+            accept="application/pdf"
+            onUpload={(url) => setFormData(prev => ({...prev, cvUrl: url}))}
+          />
+          <div className="mt-2">
+            <label className="text-[8px] font-bold tracking-widest text-gray-400 uppercase">OR PASTE CV DOWNLOAD URL</label>
+            <input className="w-full border border-black p-2 text-xs outline-none focus:ring-1 focus:ring-black mt-1" placeholder="https://..." value={formData.cvUrl.startsWith('data:') ? 'Local Upload' : formData.cvUrl} onChange={e => setFormData(prev => ({...prev, cvUrl: e.target.value}))} />
+          </div>
         </div>
         <div className="space-y-2">
           <label className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">GITHUB</label>
@@ -189,7 +198,7 @@ function ResearchManager({ items }: { items: Research[] }) {
             <input className="w-full border border-black p-4 text-sm" placeholder="TERM/DATE (e.g. Fall 2025)" value={newItem.date} onChange={e => setNewItem({...newItem, date: e.target.value})} />
             
             <div className="md:col-span-2">
-              <ImageUpload 
+              <FileUpload 
                 label="RESEARCH COVER IMAGE"
                 currentValue={newItem.coverImage}
                 onUpload={(url) => setNewItem(prev => ({...prev, coverImage: url}))}
@@ -261,7 +270,7 @@ function TickerManager({ items }: { items: TickerImage[] }) {
                 <h3 className="font-display font-bold text-2xl mb-8 uppercase tracking-tighter">ADD TICKER IMAGE_</h3>
                 
                 <div className="mb-8">
-                  <ImageUpload 
+                  <FileUpload 
                     label="UPLOAD TICKER IMAGE"
                     currentValue={newImage.url}
                     onUpload={(url) => setNewImage(prev => ({...prev, url: url}))}
@@ -337,7 +346,7 @@ function BlogManager({ items }: { items: Blog[] }) {
             <input className="w-full border border-black p-4 text-sm" placeholder="SLUG (e.g. econometric-insights-2026)" value={newItem.slug} onChange={e => setNewItem({...newItem, slug: e.target.value})} />
             
             <div className="md:col-span-2">
-              <ImageUpload 
+              <FileUpload 
                 label="BLOG COVER IMAGE"
                 currentValue={newItem.coverImage}
                 onUpload={(url) => setNewItem(prev => ({...prev, coverImage: url}))}
