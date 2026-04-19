@@ -6,7 +6,7 @@ import { collection, addDoc, deleteDoc, doc, setDoc, serverTimestamp, query, ord
 import { Trash2, Edit2, Plus, Save, X, ExternalLink, MessageSquare, BookOpen, FlaskConical, User as UserIcon, Heart, Layout as LayoutIcon, Image as ImageIcon, Loader2, CheckCircle2 } from 'lucide-react';
 import { Research, Blog, Hobby, Profile, Message, TickerImage } from '../types';
 import { Navigate, Link } from 'react-router-dom';
-import { cn } from '../lib/utils';
+import { cn, formatImageUrl } from '../lib/utils';
 
 export default function Admin() {
   const [user, loading] = useAuthState(auth);
@@ -216,11 +216,19 @@ function ResearchManager({ items }: { items: Research[] }) {
 
 function TickerManager({ items }: { items: TickerImage[] }) {
     const [newImage, setNewImage] = useState({ url: '', alt: '' });
+    const [adding, setAdding] = useState(false);
 
     const add = async () => {
         if (!newImage.url) return;
-        await addDoc(collection(db, 'ticker'), newImage);
-        setNewImage({ url: '', alt: '' });
+        setAdding(true);
+        try {
+            await addDoc(collection(db, 'ticker'), newImage);
+            setNewImage({ url: '', alt: '' });
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setAdding(false);
+        }
     };
 
     const remove = async (id: string) => {
@@ -231,17 +239,33 @@ function TickerManager({ items }: { items: TickerImage[] }) {
         <div className="space-y-12">
             <div className="bg-neutral-50 p-10 border-l-8 border-black">
                 <h3 className="font-display font-bold text-2xl mb-8 uppercase tracking-tighter">ADD TICKER IMAGE_</h3>
-                <div className="flex gap-4">
-                    <input className="flex-grow border border-black p-4 text-sm" placeholder="IMAGE URL" value={newImage.url} onChange={e => setNewImage({...newImage, url: e.target.value})} />
-                    <input className="border border-black p-4 text-sm w-48" placeholder="ALT TEXT" value={newImage.alt} onChange={e => setNewImage({...newImage, alt: e.target.value})} />
-                    <button onClick={add} className="bg-black text-white px-8 py-4 font-bold uppercase text-xs tracking-widest">ADD</button>
+                <div className="flex flex-col md:flex-row gap-4">
+                    <input className="flex-grow border border-black p-4 text-sm" placeholder="IMAGE URL (DRIVE LINKS SUPPORTED)" value={newImage.url} onChange={e => setNewImage({...newImage, url: e.target.value})} />
+                    <input className="border border-black p-4 text-sm w-full md:w-48" placeholder="ALT TEXT" value={newImage.alt} onChange={e => setNewImage({...newImage, alt: e.target.value})} />
+                    <button 
+                        disabled={adding}
+                        onClick={add} 
+                        className="bg-black text-white px-8 py-4 font-bold uppercase text-xs tracking-widest hover:bg-neutral-800 disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                        {adding ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                        {adding ? 'ADDING...' : 'ADD TO TICKER'}
+                    </button>
                 </div>
+                {newImage.url && (
+                    <div className="mt-6 flex items-center gap-4 animate-in fade-in slide-in-from-top-2">
+                        <span className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">PREVIEW:</span>
+                        <div className="w-20 h-20 border border-black p-1 bg-white">
+                            <img src={formatImageUrl(newImage.url)} alt="Preview" className="w-full h-full object-cover grayscale" referrerPolicy="no-referrer" />
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {items.length === 0 && <p className="col-span-full text-center py-20 text-gray-400 font-bold tracking-widest uppercase border border-dashed border-gray-200">NO TICKER IMAGES FOUND.</p>}
                 {items.map(item => (
-                    <div key={item.id} className="relative aspect-square border border-black group p-1">
-                        <img src={item.url} alt={item.alt} className="w-full h-full object-cover grayscale" referrerPolicy="no-referrer" />
+                    <div key={item.id} className="relative aspect-square border border-black group p-1 animate-in zoom-in-95">
+                        <img src={formatImageUrl(item.url)} alt={item.alt} className="w-full h-full object-cover grayscale" referrerPolicy="no-referrer" />
                         <button 
                             onClick={() => remove(item.id)}
                             className="absolute top-2 right-2 bg-red-600 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity"
