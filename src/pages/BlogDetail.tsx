@@ -6,6 +6,7 @@ import { Blog } from '../types';
 import Markdown from 'react-markdown';
 import { ArrowLeft, Calendar, Share2, Clock } from 'lucide-react';
 import { motion } from 'motion/react';
+import { formatImageUrl } from '../lib/utils';
 
 export default function BlogDetail() {
   const { id } = useParams();
@@ -41,7 +42,7 @@ export default function BlogDetail() {
 
             {post.coverImage && (
                 <div className="mb-20 border border-black p-2 bg-neutral-50 shadow-xl grayscale hover:grayscale-0 transition-all duration-1000">
-                    <img src={post.coverImage} alt={post.title} className="w-full object-cover aspect-video" referrerPolicy="no-referrer" />
+                    <img src={formatImageUrl(post.coverImage)} alt={post.title} className="w-full object-cover aspect-video" referrerPolicy="no-referrer" />
                 </div>
             )}
 
@@ -59,7 +60,7 @@ export default function BlogDetail() {
                     <div className="grid grid-cols-1 gap-6">
                         {post.gallery.map((img, idx) => (
                             <div key={idx} className="border border-black p-1 hover:scale-[1.02] transition-transform duration-300 shadow-lg">
-                                <img src={img} alt={`Gallery ${idx}`} className="w-full grayscale hover:grayscale-0 transition-all" referrerPolicy="no-referrer" />
+                                <img src={formatImageUrl(img)} alt={`Gallery ${idx}`} className="w-full grayscale hover:grayscale-0 transition-all" referrerPolicy="no-referrer" />
                             </div>
                         ))}
                     </div>

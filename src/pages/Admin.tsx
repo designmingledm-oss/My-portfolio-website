@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollection, useDocumentData } from 'react-firebase-hooks/firestore';
 import { auth, db } from '../lib/firebase';
-import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
-import { Trash2, Edit2, Plus, Save, X, ExternalLink, MessageSquare, BookOpen, FlaskConical, User as UserIcon, Heart, Layout as LayoutIcon, Image as ImageIcon } from 'lucide-react';
+import { collection, addDoc, deleteDoc, doc, setDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { Trash2, Edit2, Plus, Save, X, ExternalLink, MessageSquare, BookOpen, FlaskConical, User as UserIcon, Heart, Layout as LayoutIcon, Image as ImageIcon, Loader2, CheckCircle2 } from 'lucide-react';
 import { Research, Blog, Hobby, Profile, Message, TickerImage } from '../types';
 import { Navigate, Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
@@ -76,16 +76,29 @@ export default function Admin() {
 // --- SUB-COMPONENTS FOR CMS ---
 
 function ProfileManager({ profile, docRef }: { profile?: Profile, docRef: any }) {
-  const [formData, setFormData] = useState<Profile>(profile || { name: 'Sabbir', bio: 'I love Econometric analysis', email: 'designmingle.dm@gmail.com', github: '', linkedin: '', cvUrl: '', heroImage: '' });
+  const [formData, setFormData] = useState<Profile>({ name: 'Sabbir', bio: 'I love Econometric analysis', email: 'designmingle.dm@gmail.com', github: '', linkedin: '', cvUrl: '', heroImage: '' });
+  const [saving, setSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  // Sync with Firestore data when it loads
+  useEffect(() => {
+    if (profile) {
+      setFormData(profile);
+    }
+  }, [profile]);
 
   const save = async () => {
+    setSaving(true);
+    setSaveStatus('idle');
     try {
-        await updateDoc(docRef, { ...formData });
-        alert('Profile updated');
+        await setDoc(docRef, { ...formData }, { merge: true });
+        setSaveStatus('success');
+        setTimeout(() => setSaveStatus('idle'), 3000);
     } catch(e) {
-        // If doc doesn't exist, we might need a setDoc, but updateDoc is safer if it was pre-created
-        // For simplicity in this demo environment, let's just assume it exists or use setDoc logic elsewhere
         console.error(e);
+        setSaveStatus('error');
+    } finally {
+        setSaving(false);
     }
   };
 
@@ -122,8 +135,17 @@ function ProfileManager({ profile, docRef }: { profile?: Profile, docRef: any })
           <input className="w-full border border-black p-4 text-sm outline-none focus:ring-1 focus:ring-black" value={formData.linkedin} onChange={e => setFormData({...formData, linkedin: e.target.value})} />
         </div>
       </div>
-      <button onClick={save} className="bg-black text-white px-10 py-5 font-bold tracking-[0.2em] text-xs hover:bg-neutral-800 flex items-center gap-2 transition-all">
-        <Save size={16} /> SAVE PROFILE
+      <button 
+        disabled={saving}
+        onClick={save} 
+        className={cn(
+          "px-10 py-5 font-bold tracking-[0.2em] text-xs flex items-center gap-2 transition-all",
+          saveStatus === 'success' ? "bg-green-600 text-white" : "bg-black text-white hover:bg-neutral-800",
+          saving && "opacity-50 cursor-not-allowed"
+        )}
+      >
+        {saving ? <Loader2 size={16} className="animate-spin" /> : saveStatus === 'success' ? <CheckCircle2 size={16} /> : <Save size={16} />}
+        {saving ? 'SAVING...' : saveStatus === 'success' ? 'PROFILE SAVED' : 'SAVE PROFILE'}
       </button>
     </div>
   );

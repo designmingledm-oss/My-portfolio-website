@@ -5,7 +5,7 @@ import { db } from '../lib/firebase';
 import { ChevronRight, FlaskConical, BookOpen, Terminal, Mail, Download, ArrowUpRight, Github, Linkedin, ExternalLink, GraduationCap, Cpu, Rocket, ChevronDown, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Research, Blog, Hobby, Profile, TickerImage } from '../types';
-import { cn } from '../lib/utils';
+import { cn, formatImageUrl, formatDownloadUrl } from '../lib/utils';
 import { useState } from 'react';
 
 export default function Home() {
@@ -72,7 +72,7 @@ export default function Home() {
                   Get in touch <ChevronRight size={16} />
                 </a>
                 <a 
-                  href={profile?.cvUrl || "#"} 
+                  href={formatDownloadUrl(profile?.cvUrl) || "#"} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="border border-black px-10 py-5 font-bold text-xs tracking-[0.3em] hover:bg-black hover:text-white transition-all uppercase flex items-center gap-2"
@@ -90,7 +90,7 @@ export default function Home() {
             >
                <div className="border border-black p-3 bg-white grayscale hover:grayscale-0 transition-all duration-1000 shadow-2xl">
                     <img 
-                        src={profile?.heroImage || "https://picsum.photos/seed/sabbir/800/1000"} 
+                        src={formatImageUrl(profile?.heroImage) || "https://picsum.photos/seed/sabbir/800/1000"} 
                         alt="Sabbir" 
                         className="w-full object-cover aspect-[4/5] bg-neutral-100"
                         referrerPolicy="no-referrer"
@@ -123,7 +123,7 @@ export default function Home() {
           >
             {tickerItems.length > 0 ? [...tickerItems, ...tickerItems].map((item, idx) => (
                <div key={`${item.id}-${idx}`} className="w-[300px] md:w-[450px] aspect-video border border-white/20 p-1 flex-shrink-0 grayscale hover:grayscale-0 transition-all duration-500 hover:scale-105">
-                 <img src={item.url} alt={item.alt || "Ticker"} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                 <img src={formatImageUrl(item.url)} alt={item.alt || "Ticker"} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                </div>
             )) : (
                 [1,2,3,4,5,6].map(i => (
@@ -315,7 +315,7 @@ export default function Home() {
                 <p className="text-gray-500 max-w-md font-light text-lg">Download my comprehensive CV covering research, technical skills, and academic history.</p>
               </div>
               <a 
-                href={profile?.cvUrl || "#"} 
+                href={formatDownloadUrl(profile?.cvUrl) || "#"} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="bg-black text-white px-16 py-8 font-bold tracking-[0.3em] hover:bg-neutral-800 transition-all uppercase flex items-center gap-4 text-sm shrink-0"

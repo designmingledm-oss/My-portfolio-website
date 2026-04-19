@@ -6,6 +6,7 @@ import { Research } from '../types';
 import Markdown from 'react-markdown';
 import { ArrowLeft, Calendar, FlaskConical, ExternalLink, Image as ImageIcon } from 'lucide-react';
 import { motion } from 'motion/react';
+import { formatImageUrl } from '../lib/utils';
 
 export default function ResearchDetail() {
   const { id } = useParams();
@@ -47,7 +48,7 @@ export default function ResearchDetail() {
         {project.coverImage ? (
           <div className="border border-black p-2">
             <img 
-              src={project.coverImage} 
+              src={formatImageUrl(project.coverImage)} 
               alt={project.title} 
               className="w-full grayscale hover:grayscale-0 transition-all duration-700"
               referrerPolicy="no-referrer"
@@ -74,7 +75,7 @@ export default function ResearchDetail() {
                     <div className="grid grid-cols-1 gap-4">
                        {project.gallery.map((img, idx) => (
                            <div key={idx} className="border border-black p-1 hover:scale-[1.02] transition-transform">
-                              <img src={img} alt={`Gallery ${idx}`} className="w-full grayscale hover:grayscale-0 transition-all" referrerPolicy="no-referrer" />
+                              <img src={formatImageUrl(img)} alt={`Gallery ${idx}`} className="w-full grayscale hover:grayscale-0 transition-all" referrerPolicy="no-referrer" />
                            </div>
                        ))}
                     </div>
