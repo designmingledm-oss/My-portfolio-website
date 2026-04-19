@@ -1,0 +1,84 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      // Hardcoded admin email from runtime context
+      return isSignedIn() && request.auth.token.email == 'designmingle.dm@gmail.com' && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // --- Validation Helpers ---
+
+    function isValidProfile(data) {
+      return data.keys().hasAll(['name', 'email']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.email is string && data.email.size() <= 200;
+    }
+
+    function isValidResearch(data) {
+      return data.keys().hasAll(['title', 'description']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.description is string && data.description.size() > 0;
+    }
+
+    function isValidBlog(data) {
+      return data.keys().hasAll(['title', 'content', 'slug', 'date']) &&
+             data.title is string && data.title.size() > 0 &&
+             data.slug is string && data.slug.matches('^[a-z0-9-]+$');
+    }
+
+    function isValidMessage(data) {
+      return data.keys().hasAll(['name', 'email', 'message', 'timestamp']) &&
+             data.name is string && data.name.size() > 0 &&
+             data.email is string && data.email.size() > 0 &&
+             data.message is string && data.message.size() > 0 &&
+             data.timestamp == request.time;
+    }
+
+    // --- Collection Matches ---
+
+    match /profiles/{userId} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow write: if isAdmin() && isValidProfile(request.resource.data);
+    }
+
+    match /research/{id} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidResearch(request.resource.data);
+    }
+
+    match /blogs/{id} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidBlog(request.resource.data);
+    }
+
+    match /hobbies/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /messages/{id} {
+      allow create: if isValidMessage(request.resource.data);
+      allow get, list, delete: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "entities": {
+    "Profile": {
+      "title": "Profile",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "bio": { "type": "string" },
+        "cvUrl": { "type": "string" },
+        "email": { "type": "string" },
+        "linkedin": { "type": "string" },
+        "github": { "type": "string" }
+      },
+      "required": ["name", "email"]
+    },
+    "Research": {
+      "title": "Research Highlight",
+      "description": "Information about a research project",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "date": { "type": "string" },
+        "link": { "type": "string" }
+      },
+      "required": ["title", "description"]
+    },
+    "Blog": {
+      "title": "Blog Post",
+      "description": "A blog article entry",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "date": { "format": "date-time", "type": "string" },
+        "slug": { "type": "string" }
+      },
+      "required": ["title", "content", "slug"]
+    },
+    "Hobby": {
+      "title": "Hobby",
+      "description": "User hobbies",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "icon": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "Message": {
+      "title": "Contact Message",
+      "description": "Message from the contact form",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "message": { "type": "string" },
+        "timestamp": { "format": "date-time", "type": "string" }
+      },
+      "required": ["name", "email", "message"]
+    }
+  },
+  "firestore": {
+    "/profiles/{userId}": {
+      "schema": "Profile",
+      "description": "Stores user profile data"
+    },
+    "/research/{id}": {
+      "schema": "Research",
+      "description": "Stores research highlights"
+    },
+    "/blogs/{id}": {
+      "schema": "Blog",
+      "description": "Stores blog posts"
+    },
+    "/hobbies/{id}": {
+      "schema": "Hobby",
+      "description": "Stores hobbies"
+    },
+    "/messages/{id}": {
+      "schema": "Message",
+      "description": "Stores contact messages"
+    }
+  }
+}
